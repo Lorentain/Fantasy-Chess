@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public enum CharacterType {Ogro, Caballero, Mago, None}
+public enum CharacterType {Ogro, Caballero, Mago, Interactable, None}
 
 [Serializable]
 public class BoardCell
@@ -21,9 +22,10 @@ public class BoardState
 {
     public List<BoardRow> rows;
 
-    public int playerTurn;
+    public int playerTurn = 1;
 
-    public CharacterType nextCharacter;
+    public Vector2Int cellChooseP1;
 
+    public Vector2Int cellChooseP2;
     
 }

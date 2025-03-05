@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 4623942954339157697}
   - component: {fileID: 7287170623201981924}
   m_Layer: 0
-  m_Name: Character Knight
+  m_Name: Character Knight P1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -164,7 +164,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: -1336989060, guid: d5e858d3ebf8a274596669bf6331d922, type: 3}
+  m_Sprite: {fileID: -9148460825994926039, guid: d8b05b2fd93eaf349be97c3b1afcc764, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

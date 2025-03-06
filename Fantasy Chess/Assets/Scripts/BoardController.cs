@@ -239,8 +239,23 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    // public static void MovementCharacter(int x, int y)
-    // {
+    public static void MovementCharacter(int x, int y) // x = 0 a 18, y = 0 a 10
+    {
+        if (instance.boardState.playerTurn == 3)
+        {
+            if (x == instance.boardState.cellChooseP1.x + 1) // || x == instance.boardState.cellChooseP1.x - 1
+            {
+                //instance.boardState.rows[y].columnCells[x]
+            }
+
+            if (y == instance.boardState.cellChooseP1.y + 1 || y == instance.boardState.cellChooseP1.y - 1)
+            {
+
+            }
+        }
+    }
+
+    // public static void AvailablePositionsToMove() {
 
     // }
 

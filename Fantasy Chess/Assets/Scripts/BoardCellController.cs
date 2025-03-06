@@ -13,6 +13,7 @@ public class BoardCellController : MonoBehaviour
         }
         else if (BoardController.GetPlayerTurn() == 3 || BoardController.GetPlayerTurn() == 4)
         {
+            
             BoardController.InstanceOrMove((int)transform.position.x, -(int)transform.position.y);
         }
     }

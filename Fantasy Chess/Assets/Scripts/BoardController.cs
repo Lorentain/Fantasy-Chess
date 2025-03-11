@@ -95,11 +95,12 @@ public class BoardController : MonoBehaviour
 
     private void BoardRepresentation(BoardState boardToRepresent)
     {
+        ClearBoard();
         for (int i = 0; i < boardToRepresent.rows.Count; i++)
         {
             for (int j = 0; j < boardToRepresent.rows[i].columnCells.Count; j++)
             {
-                switch (boardToRepresent.rows[i].columnCells[j].character)
+                switch (GetCharacter(j, i))
                 {
                     case CharacterType.Caballero:
                         {
@@ -177,17 +178,17 @@ public class BoardController : MonoBehaviour
         {
             switch (instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y)
             {
-                case (2, 1):
+                case (16, 8):
                     {
                         instance.boardState.rows[y].columnCells[x].character = CharacterType.Mago;
                         break;
                     }
-                case (3, 1):
+                case (15, 8):
                     {
                         instance.boardState.rows[y].columnCells[x].character = CharacterType.Ogro;
                         break;
                     }
-                case (4, 1):
+                case (14, 8):
                     {
                         instance.boardState.rows[y].columnCells[x].character = CharacterType.Caballero;
                         break;
@@ -203,7 +204,7 @@ public class BoardController : MonoBehaviour
                 case 1:
                 case 3:
                     {
-                        instance.boardState.rows[x].columnCells[y].player = 1;
+                        instance.boardState.rows[y].columnCells[x].player = 1;
                         if (instance.boardState.playerTurn == 4)
                         {
                             instance.boardState.playerTurn = 1;
@@ -217,7 +218,7 @@ public class BoardController : MonoBehaviour
                 case 4:
                 case 2:
                     {
-                        instance.boardState.rows[x].columnCells[y].player = 2;
+                        instance.boardState.rows[y].columnCells[x].player = 2;
                         if (instance.boardState.playerTurn == 4)
                         {
                             instance.boardState.playerTurn = 1;
@@ -239,18 +240,50 @@ public class BoardController : MonoBehaviour
         }
     }
 
+    // Función que comprueba si el personaje se puede mover a la nueva posición
     public static void MovementCharacter(int x, int y) // x = 0 a 18, y = 0 a 10
     {
-        if (instance.boardState.playerTurn == 3)
+        if (instance.boardState.playerTurn == 3 && !(x == 2 && y == 1 || x == 3 && y == 1 || x == 4 && y == 1) && instance.boardState.rows[y].columnCells[x].character == CharacterType.Interactable)
         {
-            if (x == instance.boardState.cellChooseP1.x + 1) // || x == instance.boardState.cellChooseP1.x - 1
+            MoveCharacter(x, y, instance.boardState.cellChooseP1, 1);
+            Debug.Log("Movimiento de personaje turno 3");
+        }
+        else if (instance.boardState.playerTurn == 4 && !(x == 14 && y == 8 || x == 15 && y == 8 || x == 16 && y == 8) && instance.boardState.rows[y].columnCells[x].character == CharacterType.Interactable)
+        {
+            MoveCharacter(x, y, instance.boardState.cellChooseP2, 2);
+            Debug.Log("Movimiento de personaje turno 4");
+        }
+        else
+        {
+            Debug.Log("Movimiento erroneo");
+        }
+        instance.BoardRepresentation(instance.boardState);
+    }
+
+    // Función que mueve el personaje a la nueva posición
+    private static void MoveCharacter(int x, int y, Vector2Int cellChoose, int player)
+    {
+        if ((x == cellChoose.x + 1 && y == cellChoose.y) ||
+            (x == cellChoose.x - 1 && y == cellChoose.y) ||
+            (y == cellChoose.y + 1 && x == cellChoose.x) ||
+            (y == cellChoose.y - 1 && x == cellChoose.x))
+        {
+            // Cambiar el personaje a la nueva posición
+            instance.boardState.rows[y].columnCells[x].character = GetCharacter(cellChoose.x, cellChoose.y);
+            instance.boardState.rows[y].columnCells[x].player = player;
+
+            // Borrar el personaje de la posición anterior
+            instance.boardState.rows[cellChoose.y].columnCells[cellChoose.x].character = CharacterType.Interactable;
+            instance.boardState.rows[cellChoose.y].columnCells[cellChoose.x].player = 0;
+
+            // Cambiar el turno
+            if (player == 1)
             {
-                //instance.boardState.rows[y].columnCells[x]
+                instance.boardState.playerTurn++;
             }
-
-            if (y == instance.boardState.cellChooseP1.y + 1 || y == instance.boardState.cellChooseP1.y - 1)
+            else
             {
-
+                instance.boardState.playerTurn = 1;
             }
         }
     }
@@ -263,13 +296,27 @@ public class BoardController : MonoBehaviour
     {
         if (instance.boardState.playerTurn == 1)
         {
-            instance.boardState.cellChooseP1 = new Vector2Int(x, y);
-            instance.boardState.playerTurn++;
+            if (instance.boardState.rows[y].columnCells[x].character != CharacterType.Interactable && instance.boardState.rows[y].columnCells[x].player != 2)
+            {
+                instance.boardState.cellChooseP1 = new Vector2Int(x, y);
+                instance.boardState.playerTurn++;
+            }
+            else
+            {
+                Debug.Log("Jugador 1 jugada erronea");
+            }
         }
         else if (instance.boardState.playerTurn == 2)
         {
-            instance.boardState.cellChooseP2 = new Vector2Int(x, y);
-            instance.boardState.playerTurn++;
+            if (instance.boardState.rows[y].columnCells[x].character != CharacterType.Interactable && instance.boardState.rows[y].columnCells[x].player != 1)
+            {
+                instance.boardState.cellChooseP2 = new Vector2Int(x, y);
+                instance.boardState.playerTurn++;
+            }
+            else
+            {
+                Debug.Log("Jugador 2 jugada erronea");
+            }
         }
     }
 
@@ -277,28 +324,74 @@ public class BoardController : MonoBehaviour
     public static void InstanceOrMove(int x, int y)
     {
         Debug.Log("Entro en instanceOrMove" + x + "," + y);
-        //bool aux = false;
-        if (instance.boardState.playerTurn == 3 && IsInstance(instance.boardState.cellChooseP1.x, instance.boardState.cellChooseP1.y) == true)
+
+        if (instance.boardState.playerTurn == 3)
         {
-            Debug.Log("Entra turno 3");
-            UpdateCell(x, y);
-        }
-        else if (instance.boardState.playerTurn == 4 && IsInstance(instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y) == true)
-        {
-            Debug.Log("Entra turno 4");
-            UpdateCell(x, y);
+            if (IsInstance(instance.boardState.cellChooseP1.x, instance.boardState.cellChooseP1.y) == true && (x == 2 && y == 2 || x == 3 && y == 2 || x == 4 && y == 2))
+            {
+                Debug.Log("Entra turno 3");
+                UpdateCell(x, y);
+            }
+            else
+            {
+                Debug.Log("Jugador 1 jugada erronea de instancia de instancia");
+            }
+
+            if (IsCharacter(instance.boardState.cellChooseP1.x, instance.boardState.cellChooseP1.y) == true)
+            {
+                MovementCharacter(x, y);
+                Debug.Log("Función de movimiento de personaje turno 3");
+            }
+            else
+            {
+                Debug.Log("Jugador 1 jugada erronea de instancia de movimiento");
+            }
         }
 
-        if (instance.boardState.playerTurn == 3 && IsCharacter(instance.boardState.cellChooseP1.x, instance.boardState.cellChooseP1.y) == true)
+        else if (instance.boardState.playerTurn == 4)
         {
-            // Llamar función de movimiento del personaje
-            Debug.Log("Función de movimiento de personaje turno 3");
+            if (IsInstance(instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y) == true && (x == 14 && y == 7 || x == 15 && y == 7 || x == 16 && y == 7))
+            {
+                Debug.Log("Entra turno 4");
+                UpdateCell(x, y);
+            }
+            else
+            {
+                Debug.Log("Jugador 2 jugada erronea de instancia");
+            }
+
+            if (IsCharacter(instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y) == true)
+            {
+                MovementCharacter(x, y);
+                Debug.Log("Función de movimiento de personaje turno 4");
+            }
+            else
+            {
+                Debug.Log("Jugador 2 jugada erronea de movimiento");
+            }
         }
-        else if (instance.boardState.playerTurn == 4 && IsCharacter(instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y) == true)
-        {
-            // Llamar función de movimiento del personaje
-            Debug.Log("Función de movimiento de personaje turno 4");
-        }
+
+        // if (instance.boardState.playerTurn == 3 && IsInstance(instance.boardState.cellChooseP1.x, instance.boardState.cellChooseP1.y) == true)
+        // {
+        //     Debug.Log("Entra turno 3");
+        //     UpdateCell(x, y);
+        // }
+        // else if (instance.boardState.playerTurn == 4 && IsInstance(instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y) == true)
+        // {
+        //     Debug.Log("Entra turno 4");
+        //     UpdateCell(x, y);
+        // }
+
+        // if (instance.boardState.playerTurn == 3 && IsCharacter(instance.boardState.cellChooseP1.x, instance.boardState.cellChooseP1.y) == true)
+        // {
+        //     // Llamar función de movimiento del personaje
+        //     Debug.Log("Función de movimiento de personaje turno 3");
+        // }
+        // else if (instance.boardState.playerTurn == 4 && IsCharacter(instance.boardState.cellChooseP2.x, instance.boardState.cellChooseP2.y) == true)
+        // {
+        //     // Llamar función de movimiento del personaje
+        //     Debug.Log("Función de movimiento de personaje turno 4");
+        // }
         //return aux;
     }
 
@@ -307,8 +400,8 @@ public class BoardController : MonoBehaviour
     {
         Debug.Log($"{x},{y}");
         bool aux = false;
-        Debug.Log(instance.boardState.rows[y].columnCells[x].character + "," + instance.boardState.rows[y].columnCells[x].player);
-        if (instance.boardState.rows[y].columnCells[x].character == CharacterType.None && instance.boardState.rows[y].columnCells[x].player != 0)
+        Debug.Log(GetCharacter(x, y) + "," + instance.boardState.rows[y].columnCells[x].player);
+        if (GetCharacter(x, y) == CharacterType.None && instance.boardState.rows[y].columnCells[x].player != 0)
         {
             aux = true;
         }
@@ -319,7 +412,7 @@ public class BoardController : MonoBehaviour
     {
         bool aux = false;
 
-        if (instance.boardState.rows[y].columnCells[x].character != CharacterType.Interactable && instance.boardState.rows[y].columnCells[x].character != CharacterType.None)
+        if (GetCharacter(x, y) != CharacterType.Interactable && GetCharacter(x, y) != CharacterType.None)
         {
             aux = true;
         }
@@ -339,4 +432,24 @@ public class BoardController : MonoBehaviour
     {
         return instance.boardState.playerTurn;
     }
+
+    public static CharacterType GetCharacter(int x, int y)
+    {
+        CharacterType res = CharacterType.None;
+        if (instance.boardState.rows[y].columnCells[x].character != CharacterType.None)
+        {
+            res = instance.boardState.rows[y].columnCells[x].character;
+        }
+        return res;
+    }
+
+    // public static string GetPlayerWin() {
+    //     if(instance.boardState.rows[2].columnCells[1].character != CharacterType.None || instance.boardState.rows[3].columnCells[1].character != CharacterType.Interactable) {
+    //         return "Player 1 wins";
+    //     }
+
+    //     if(instance.boardState.rows[7].columnCells[16].character != CharacterType.None || instance.boardState.rows[8].columnCells[16].character != CharacterType.Interactable) {
+    //         return "Player 2 wins";
+    //     }
+    // }
 }

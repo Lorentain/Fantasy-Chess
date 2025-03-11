@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7053699717488074496}
   - component: {fileID: 8585658569895656786}
   - component: {fileID: 8845919127147285139}
-  - component: {fileID: 5874668072410428851}
+  - component: {fileID: 5147152592136218689}
   m_Layer: 0
   m_Name: Character Mage P1
   m_TagString: Untagged
@@ -136,7 +136,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &5874668072410428851
+--- !u!114 &5147152592136218689
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5660044807461562035}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c73588625f26cae4d8d6f78209ba6a1c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c875aadc82f26b4fa2f381738bb35ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8382343415849595789

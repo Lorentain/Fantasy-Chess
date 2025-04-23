@@ -14,7 +14,7 @@ public class BoardCell
         player = other.player;
     }
 
-    public BoardCell() {}
+    public BoardCell() { }
 
     public CharacterType character;
 
@@ -26,7 +26,7 @@ public class BoardRow
 {
     public List<BoardCell> columnCells;
 
-    public BoardRow() {}
+    public BoardRow() { }
 
     public BoardRow(List<BoardCell> columnCells)
     {
@@ -37,15 +37,20 @@ public class BoardRow
 [Serializable]
 public class BoardState
 {
+    public int id;
+
+    public static int idCounter = 0;
+
     public BoardState(BoardState other)
     {
+        // id = idCounter++;
         rows = new List<BoardRow>(other.rows);
         playerTurn = other.playerTurn;
         cellChooseP1 = other.cellChooseP1;
         cellChooseP2 = other.cellChooseP2;
     }
 
-    public BoardState() {}
+    public BoardState() { id = idCounter++; }
 
     public List<BoardRow> rows;
 
@@ -57,6 +62,7 @@ public class BoardState
 
     public string GetPlayerWin()
     {
+        Debug.Log($"[BoardState {id}] Checking winner");
         string res = "No winner";
         if (rows[8].columnCells[14].player == 1 || rows[8].columnCells[15].player == 1 || rows[8].columnCells[16].player == 1)
         {
@@ -72,7 +78,7 @@ public class BoardState
 
     public int GetHeuristic()
     {
-        Debug.Log("Heuristica");
+        Debug.Log($"[BoardState {id}] Calculating heuristic");
         int res = 0;
         if (rows[8].columnCells[14].player == 1 || rows[8].columnCells[15].player == 1 || rows[8].columnCells[16].player == 1)
         {
@@ -87,8 +93,10 @@ public class BoardState
     }
 
     // Función que comprueba si el personaje se puede mover a la nueva posición
-    public void MovementCharacter(int x, int y) // x = 0 a 18, y = 0 a 10
+    public bool MovementCharacter(int x, int y) // x = 0 a 18, y = 0 a 10
     {
+        Debug.Log($"[BoardState {id}] Attempting to move character to ({x}, {y})");
+        bool res = false;
         if ((playerTurn == 3)
             && !(x == 2 && y == 1 || x == 3 && y == 1 || x == 4 && y == 1)
             && rows[y].columnCells[x].character == CharacterType.Interactable
@@ -96,6 +104,7 @@ public class BoardState
             )
         {
             MoveCharacter(x, y, cellChooseP1, 1);
+            res = true;
             Debug.Log(GetPlayerWin());
             Debug.Log("Movimiento de personaje turno 3");
         }
@@ -106,6 +115,7 @@ public class BoardState
             )
         {
             MoveCharacter(x, y, cellChooseP2, 2);
+            res = true;
             Debug.Log(GetPlayerWin());
             Debug.Log("Movimiento de personaje turno 4");
         }
@@ -113,11 +123,14 @@ public class BoardState
         {
             Debug.Log("Movimiento erroneo");
         }
+
+        return res;
     }
 
     // Función que mueve el personaje a la nueva posición
     private void MoveCharacter(int x, int y, Vector2Int cellChoose, int player)
     {
+        Debug.Log($"[BoardState {id}] Moving character from ({cellChoose.x}, {cellChoose.y}) to ({x}, {y})");
         if ((x == cellChoose.x + 1 && y == cellChoose.y) ||
             (x == cellChoose.x - 1 && y == cellChoose.y) ||
             (y == cellChoose.y + 1 && x == cellChoose.x) ||
@@ -132,6 +145,7 @@ public class BoardState
             rows[cellChoose.y].columnCells[cellChoose.x].player = 0;
 
             // Cambiar el turno
+            Debug.Log("Movimiento correcto");
             if (player == 1)
             {
                 playerTurn++;
@@ -145,6 +159,7 @@ public class BoardState
 
     public void ChooseCellPlayer(int x, int y)
     {
+        Debug.Log($"[BoardState {id}] Choosing cell ({x}, {y}) for player {playerTurn}");
         if (playerTurn == 1)
         {
             if (rows[y].columnCells[x].character != CharacterType.Interactable && rows[y].columnCells[x].player == 1)
@@ -174,6 +189,7 @@ public class BoardState
 
     public void UpdateCell(int x, int y)
     {
+        Debug.Log($"[BoardState {id}] Updating cell ({x}, {y})");
         bool validPlay = false;
 
         if (playerTurn == 3)
@@ -260,7 +276,7 @@ public class BoardState
     // Función que comprueba si estás seleccionando para instanciar personaje o mover personaje
     public void InstanceOrMove(int x, int y)
     {
-        Debug.Log("Entro en instanceOrMove" + x + "," + y);
+        Debug.Log($"[BoardState {id}] Instance or move at ({x}, {y})");
 
         if (playerTurn == 3)
         {
@@ -273,19 +289,22 @@ public class BoardState
             }
             else
             {
-                Debug.Log("Jugador 1 jugada erronea de instancia de instancia");
+                Debug.Log("Jugador 1 jugada erronea de instancia");
             }
 
             if (IsCharacter(cellChooseP1.x, cellChooseP1.y) == true)
             {
                 Debug.Log("Función de movimiento de personaje turno 3");
+                // if(MovementCharacter(x, y)) {
+                //     aux = true;
+                // }
                 MovementCharacter(x, y);
-                aux = true;
             }
             else
             {
                 Debug.Log("Jugador 1 jugada erronea de instancia de movimiento");
             }
+
             if (aux == true)
             {
                 IAController.IA(this);
@@ -319,6 +338,7 @@ public class BoardState
     // Función que prueba si la casilla es de instanciar
     public bool IsInstance(int x, int y)
     {
+        Debug.Log($"[BoardState {id}] Checking if cell ({x}, {y}) is an instance");
         Debug.Log($"{x},{y}");
         bool aux = false;
         Debug.Log(GetCharacter(x, y) + "," + rows[y].columnCells[x].player);
@@ -331,6 +351,7 @@ public class BoardState
 
     public bool IsCharacter(int x, int y)
     {
+        Debug.Log($"[BoardState {id}] Checking if cell ({x}, {y}) contains a character");
         bool aux = false;
 
         if (GetCharacter(x, y) != CharacterType.Interactable && GetCharacter(x, y) != CharacterType.None)
@@ -353,6 +374,7 @@ public class BoardState
 
     public bool IsValidPlay(int x, int y, BoardState boardState)
     {
+        Debug.Log($"[BoardState {id}] Validating play at ({x}, {y})");
         bool res = false;
 
         switch (boardState.playerTurn)
@@ -396,7 +418,7 @@ public class BoardState
                 }
             case 4:
                 {
-                    if(IsInstance(cellChooseP2.x, cellChooseP2.y) == true && (x == 14 && y == 7 || x == 15 && y == 7 || x == 16 && y == 7))
+                    if (IsInstance(cellChooseP2.x, cellChooseP2.y) == true && (x == 14 && y == 7 || x == 15 && y == 7 || x == 16 && y == 7))
                     {
                         Debug.Log("Caso 4, " + x + "," + y);
                         res = true;
@@ -420,13 +442,17 @@ public class BoardState
 
     public BoardState ApplyPlay(int x, int y)
     {
+        Debug.Log($"[BoardState {id}] Applying play at ({x}, {y})");
+        Debug.Log("Entro en ApplyPlay");
         BoardState res = new BoardState(this);
         if (playerTurn == 1 || playerTurn == 2)
         {
+            Debug.Log("Entro en ApplyPlay en elegir casilla");
             ChooseCellPlayer(x, y);
         }
         else if (playerTurn == 3 || playerTurn == 4)
         {
+            Debug.Log("Entro en ApplyPlay en movimiento o instancia");
             InstanceOrMove(x, y);
         }
         return res;

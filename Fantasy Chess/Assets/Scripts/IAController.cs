@@ -20,7 +20,8 @@ public class IAController : MonoBehaviour
     public static void IA(BoardState boardState)
     { 
         Debug.Log("Llamando a IA");
-        AlfaBeta(boardState, 3, float.MinValue, float.MaxValue, out Vector2Int? bestPlay);
+        //AlfaBeta(boardState, 3, float.MinValue, float.MaxValue, out Vector2Int? bestPlay);
+        IAControllerTest.MonteCarlo(boardState, 2, out Vector2Int? bestPlay);
         if (BoardController.GetPlayerTurn() == 2)
         {
             boardState.ChooseCellPlayer(bestPlay.Value.x, bestPlay.Value.y);
